@@ -43,84 +43,41 @@
         then set the source for <code>getUserMedia()</code> using a <code>deviceId</code> constraint.</p>
     <p><b>Note:</b> without permission, the browser will restrict the available devices to at most one per type.</p>
 
-    <div class="select">
-        <label for="audioSource">Audio input source: </label><select id="audioSource"></select>
-    </div>
-
-    <div class="select">
-        <label for="videoSource">Video source: </label><select id="videoSource"></select>
-    </div>
-
     <video id="video" playsinline autoplay></video>
 
 </div>
 
-<script async>
+<script>
     const videoElement = document.querySelector('video');
-    const audioInputSelect = document.querySelector('select#audioSource');
-    const videoSelect = document.querySelector('select#videoSource');
-    const selectors = [audioInputSelect, videoSelect];
-
-    function gotDevices(deviceInfos) {
-    // Handles being called several times to update labels. Preserve values.
-    const values = selectors.map(select => select.value);
-    selectors.forEach(select => {
-        while (select.firstChild) {
-            select.removeChild(select.firstChild);
-        }
-    });
-    for (let i = 0; i !== deviceInfos.length; ++i) {
-        const deviceInfo = deviceInfos[i];
-        const option = document.createElement('option');
-        option.value = deviceInfo.deviceId;
-        if (deviceInfo.kind === 'audioinput') {
-            option.text = deviceInfo.label || `microphone ${audioInputSelect.length + 1}`;
-            console.log("aud:", deviceInfo)
-            audioInputSelect.appendChild(option);
-        } else if (deviceInfo.kind === 'videoinput') {
-            option.text = deviceInfo.label || `camera ${videoSelect.length + 1}`;
-            console.log("vid:", deviceInfo);
-            videoSelect.appendChild(option);
-        }
-    }
-    selectors.forEach((select, selectorIndex) => {
-        if (Array.prototype.slice.call(select.childNodes).some(n => n.value === values[selectorIndex])) {
-            select.value = values[selectorIndex];
-        }
-    });
-    }
-
-    navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(handleError);
+    let result = false;
 
     function gotStream(stream) {
-    window.stream = stream; // make stream available to console
-    videoElement.srcObject = stream;
-    // Refresh button list in case labels have become available
-    return navigator.mediaDevices.enumerateDevices();
+        window.stream = stream; // make stream available to console
+        videoElement.srcObject = stream;
+        result = true;
     }
 
     function handleError(error) {
         console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
+        result = false;
     }
 
-    function start() {
-    if (window.stream) {
-        window.stream.getTracks().forEach(track => {
-            track.stop();
-        });
-    }
-        const audioSource = audioInputSelect.value;
-        const videoSource = videoSelect.value;
-        const constraints = {
-        audio: {deviceId: audioSource ? {exact: audioSource} : undefined},
-        video: {deviceId: videoSource ? {exact: videoSource} : undefined}
-    };
-        navigator.mediaDevices.getUserMedia(constraints).then(gotStream).then(gotDevices).catch(handleError);
+    let constraints = { video: true, audio: true }
+
+    async function start() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            gotStream(stream);
+        } catch (e) {
+            handleError(e);
+        }
     }
 
-    audioInputSelect.onchange = start;
+    start();
 
-    videoSelect.onchange = start;
+    function getResult() {
+        return result;
+    }
 
 </script>
 </body>
