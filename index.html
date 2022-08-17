@@ -1,47 +1,14 @@
 <!DOCTYPE html>
-<!--
- *  Copyright (c) 2015 The WebRTC project authors. All Rights Reserved.
- *
- *  Use of this source code is governed by a BSD-style license
- *  that can be found in the LICENSE file in the root of the source
- *  tree.
--->
 <html>
 <head>
-
-    <meta charset="utf-8">
-    <meta name="description" content="WebRTC code samples">
-    <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1, maximum-scale=1">
-    <meta id="theme-color" name="theme-color" content="#ffffff">
-
-    <base target="_blank">
-
-    <title>Select audio and video sources</title>
-
-    <style>
-        div.select {
-            display: inline-block;
-            margin: 0 0 1em 0;
-        }
-
-        p.small {
-            font-size: 0.7em;
-        }
-
-        label {
-            width: 12em;
-            display: inline-block;
-        }
-    </style>
-
+    <title>getUserMedia with constraints test</title>
 </head>
 
 <body style="background-color: white;">
 <div id="container">
-
-    <p>Test</p>
+    <pre style="font-size: 22px;"> Camera Test</pre>
     <video id="video" playsinline autoplay></video>
-
+    <pre style="font-size: 22px;" id="message" />
 </div>
 
 <script>
@@ -57,6 +24,7 @@
     }
 
     function handleError(error) {
+        message.innerText=error.message;
         console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
         result = false;
     }
@@ -69,6 +37,7 @@
         }
         try {
             stream = await navigator.mediaDevices.getUserMedia(constraints);
+            message.innerText="getUserMedia with constraints: " + JSON.stringify(constraints);
             gotStream(stream);
         } catch (e) {
             handleError(e);
