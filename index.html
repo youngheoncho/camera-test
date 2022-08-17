@@ -36,13 +36,10 @@
 
 </head>
 
-<body>
+<body style="background-color: white;">
 <div id="container">
 
-    <p>Get available audio, video sources and audio output devices from <code>mediaDevices.enumerateDevices()</code>
-        then set the source for <code>getUserMedia()</code> using a <code>deviceId</code> constraint.</p>
-    <p><b>Note:</b> without permission, the browser will restrict the available devices to at most one per type.</p>
-
+    <p>Test</p>
     <video id="video" playsinline autoplay></video>
 
 </div>
@@ -50,6 +47,7 @@
 <script>
     const videoElement = document.querySelector('video');
 
+    let stream;
     let result = false;
 
     function gotStream(stream) {
@@ -63,18 +61,19 @@
         result = false;
     }
 
-    let constraints = { video: true, audio: true }
-
-    async function start() {
+    async function start(constraints) {
+        if (stream) {
+            stream.getTracks().forEach(track => {
+            track.stop();
+            });
+        }
         try {
-            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            stream = await navigator.mediaDevices.getUserMedia(constraints);
             gotStream(stream);
         } catch (e) {
             handleError(e);
         }
     }
-
-    start();
 
     function getResult() {
         return result;
