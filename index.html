@@ -1,52 +1,37 @@
-<!DOCTYPE html>
-<html>
 <head>
-    <title>getUserMedia with constraints test</title>
+
+    <meta charset="utf-8">
+    <meta name="description" content="WebRTC Javascript code samples">
+    <meta id="theme-color" name="theme-color" content="#ffffff">
+
+    <title>WebRTC samples</title>
+    <style>
+        section {
+            border-bottom: 1px solid #eee;
+            margin: 0 0 1.5em 0;
+            padding: 0 0 1.5em 0;
+        }
+
+        section:last-child {
+            border-bottom: none;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
 </head>
 
-<body style="background-color: white;">
+<body>
 <div id="container">
-    <pre style="font-size: 22px;"> Camera Test</pre>
-    <video id="video" playsinline autoplay></video>
-    <pre style="font-size: 22px;" id="message" />
+
+    <h1>Webrtc demo</h1>
+    <section>
+        <ul>
+            <li><a href="resolution/index.html">select camera resolution</a></li>
+            <li><a href="rtc-codec/index.html">change codec before peer connection</a></li>
+        </ul>
+    </section>
+
 </div>
 
-<script>
-    const videoElement = document.querySelector('video');
-
-    let stream;
-    let result = false;
-
-    function gotStream(stream) {
-        window.stream = stream; // make stream available to console
-        videoElement.srcObject = stream;
-        result = true;
-    }
-
-    function handleError(error) {
-        message.innerText=error.message;
-        console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
-        result = false;
-    }
-
-    async function start(constraints) {
-        if (stream) {
-            stream.getTracks().forEach(track => {
-            track.stop();
-            });
-        }
-        try {
-            stream = await navigator.mediaDevices.getUserMedia(constraints);
-            message.innerText="getUserMedia with constraints: " + JSON.stringify(constraints);
-            gotStream(stream);
-        } catch (e) {
-            handleError(e);
-        }
-    }
-
-    function getResult() {
-        return result;
-    }
-</script>
 </body>
 </html>
