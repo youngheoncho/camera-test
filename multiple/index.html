@@ -29,7 +29,7 @@
         offerToReceiveVideo: 1
     };
 
-    let result = false;
+    let error='';
     let result1 = false;
     let result2 = false;
 
@@ -41,7 +41,6 @@
     function handleError(e) {
         message.innerText=e.message;
         error=e.message;
-        result = false;
     }
 
     async function start(constraints) {
