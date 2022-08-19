@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>getUserMedia with constraints test</title>
+    <title>Multiple peer connections Test</title>
 </head>
 
 <body style="background-color: white;">
 <div id="container">
-    <pre style="font-size: 22px;"> Camera Test</pre>
+    <pre style="font-size: 22px;"> Multiple peer connections Test</pre>
     <video id="video1" playsinline autoplay></video>
     <video id="video2" playsinline autoplay></video>
     <video id="video3" playsinline autoplay></video>
@@ -41,7 +41,6 @@
     function handleError(e) {
         message.innerText=e.message;
         error=e.message;
-        console.log('navigator.MediaDevices.getUserMedia error: ', e.message, e.name);
         result = false;
     }
 
@@ -193,6 +192,10 @@
 
     function getResult() {
         return result1 && result2;
+    }
+
+    function getError() {
+        return error;
     }
 
     start({video: true, audio: true})

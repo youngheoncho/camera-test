@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>getUserMedia with constraints test</title>
+    <title>getUserMedia Resolution Test</title>
 </head>
 
 <body style="background-color: white;">
 <div id="container">
-    <pre style="font-size: 22px;"> Camera Test</pre>
+    <pre style="font-size: 22px;"> getUserMedia Resolution Test</pre>
     <video id="video" playsinline autoplay></video>
     <pre style="font-size: 22px;" id="message" />
 </div>
@@ -16,6 +16,7 @@
 
     let stream;
     let result = false;
+    let error = '';
 
     function gotStream(stream) {
         window.stream = stream; // make stream available to console
@@ -23,9 +24,9 @@
         result = true;
     }
 
-    function handleError(error) {
-        message.innerText=error.message;
-        console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
+    function handleError(e) {
+        message.innerText=e.message;
+        error=e.message;
         result = false;
     }
 
@@ -46,6 +47,10 @@
 
     function getResult() {
         return result;
+    }
+
+    function getError() {
+        return error;
     }
 </script>
 </body>
