@@ -9,12 +9,6 @@
     <pre style="font-size: 22px;"> Peer connection with set codec Test</pre>
     <video id="localVideo" playsinline autoplay muted></video>
     <video id="remoteVideo" playsinline autoplay></video>
-    
-
-    <div class="box">
-        <span>Codec preferences:</span>
-        <div id="actualCodec"></div>
-    </div>
     <pre style="font-size: 22px;" id="message" />
 </div>
 
@@ -41,7 +35,6 @@
     function gotStream(stream) {
         window.stream = stream; // make stream available to console
         localVideo.srcObject = stream;
-        result = true;
     }
 
     function handleError(e) {
@@ -62,7 +55,6 @@
         }
         try {
             localStream = await navigator.mediaDevices.getUserMedia(constraints);
-            message.innerText="getUserMedia with constraints: " + JSON.stringify(constraints);
             gotStream(localStream);
         } catch (e) {
             handleError(e);
@@ -99,7 +91,6 @@
             codecs.unshift(selectedCodec);
             const transceiver = pc1.getTransceivers().find(t => t.sender && t.sender.track === localStream.getVideoTracks()[0]);
             transceiver.setCodecPreferences(codecs);
-            console.log('Preferred video codec', selectedCodec);
         }
 
         try {
@@ -166,10 +157,8 @@
                         return;
                     }
                     const codec = stats.get(stat.codecId);
-                    document.getElementById('actualCodec').innerText = 'Using ' + codec.mimeType +
-                        (codec.sdpFmtpLine ? ' ' + codec.sdpFmtpLine + ' ' : '') +
-                        ', payloadType=' + codec.payloadType + '. Encoder: ' + stat.encoderImplementation;
-                    });
+                    message.innerText="video codec: " + JSON.stringify(codec);
+                });    
             }, 1000);
         } catch (e) {
             handleError(e);
@@ -178,8 +167,10 @@
 
     async function onIceCandidate(pc, event) {
         try {
+            console.log("await addIceCandidate")
             await (getOtherPc(pc).addIceCandidate(event.candidate));
         } catch (e) {
+            console.log("fail addIceCandidate")
             handleError(e);
         }
     }
