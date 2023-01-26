@@ -9,7 +9,8 @@
     <pre style="font-size: 22px;"> Peer connection with set codec Test</pre>
     <video id="localVideo" playsinline autoplay muted></video>
     <video id="remoteVideo" playsinline autoplay></video>
-    <pre style="font-size: 22px;" id="message" />
+    <pre style="font-size: 22px;" id="message_codec"></pre>
+    <pre style="font-size: 22px;" id="message_log"></pre>
 </div>
 
 <script>
@@ -35,11 +36,12 @@
     function gotStream(stream) {
         window.stream = stream; // make stream available to console
         localVideo.srcObject = stream;
+        message_log.innerText+="got stream from getUserMedia\n";
     }
 
     function handleError(e) {
-        message.innerText=e.message;
-        error=e.message;
+        message_log.innerText+=e.message_codec;
+        error=e.message_codec;
     }
 
     function getOtherPc(pc) {
@@ -62,14 +64,17 @@
 
     async function call(mimeType) {
         console.log('Starting call');
+        message_log.innerText+="Start call\n";
         startTime = window.performance.now();
         const videoTracks = localStream.getVideoTracks();
         const audioTracks = localStream.getAudioTracks();
         if (videoTracks.length > 0) {
             console.log(`Using video device: ${videoTracks[0].label}`);
+            message_log.innerText+=`Using video device: ${videoTracks[0].label}\n`;
         }
         if (audioTracks.length > 0) {
             console.log(`Using audio device: ${audioTracks[0].label}`);
+            message_log.innerText+=`Using audio device: ${audioTracks[0].label}\n`;
         }
         const configuration = {};
         pc1 = new RTCPeerConnection(configuration);
@@ -81,7 +86,8 @@
         pc2.addEventListener('track', gotRemoteStream);
 
         localStream.getTracks().forEach(track => pc1.addTrack(track, localStream));
-        console.log('Added local stream to pc1');
+        console.log('Adding local stream to pc1');
+        message_log.innerText+='Adding local stream to pc1';
         if (supportsSetCodecPreferences) {
             const {codecs} = RTCRtpSender.getCapabilities('video');
             const selectedCodecIndex = codecs.findIndex(c => c.mimeType === mimeType);
@@ -103,6 +109,7 @@
 
     async function onCreateOfferSuccess(desc) {
         console.log('pc1 setLocalDescription start');
+        message_log.innerText+="pc1 setLocalDescription start\n";
         try {
             await pc1.setLocalDescription(desc);
         } catch (e) {
@@ -110,6 +117,7 @@
         }
 
         console.log('pc2 setRemoteDescription start');
+        message_log.innerText+="pc2 setRemoteDescription start\n";
         try {
             await pc2.setRemoteDescription(desc);
         } catch (e) {
@@ -132,6 +140,7 @@
         if (remoteVideo.srcObject !== e.streams[0]) {
             remoteVideo.srcObject = e.streams[0];
             console.log('pc2 received remote stream');
+            message_log.innerText+="Recieved remote stream\n";
             result = true;
         }
     }
@@ -139,12 +148,14 @@
     async function onCreateAnswerSuccess(desc) {
         // console.log(`Answer from pc2:\n${desc.sdp}`);
         console.log('pc2 setLocalDescription start');
+        message_log.innerText+="pc2 setLocalDescription start\n";
         try {
             await pc2.setLocalDescription(desc);
         } catch (e) {
             handleError(e);
         }
         console.log('pc1 setRemoteDescription start');
+        message_log.innerText+="pc1 setRemoteDescription start\n";
         try {
             await pc1.setRemoteDescription(desc);
 
@@ -156,7 +167,7 @@
                         return;
                     }
                     const codec = stats.get(stat.codecId);
-                    message.innerText="video codec: " + JSON.stringify(codec);
+                    message_codec.innerText="video codec: " + JSON.stringify(codec);
                 });    
             }, 1000);
         } catch (e) {
@@ -178,6 +189,8 @@
         pc1 = null;
         pc2 = null;
         result = false;
+        message_log.innerText=''
+        message_codec.innerText=''
     }
 
     function getResult() {

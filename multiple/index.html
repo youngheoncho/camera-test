@@ -36,10 +36,11 @@
     function gotStream(stream) {
         window.stream = stream; // make stream available to console
         localVideo.srcObject = stream;
+        message.innerText+="Got stream from getUserMedia\n";
     }
 
     function handleError(e) {
-        message.innerText=e.message;
+        message.innerText+=e.message;
         error=e.message;
     }
 
@@ -59,13 +60,16 @@
 
     function call() {
         console.log('Starting calls');
+        message.innerText+="Start calls\n";
         const audioTracks = window.stream.getAudioTracks();
         const videoTracks = window.stream.getVideoTracks();
         if (audioTracks.length > 0) {
             console.log(`Using audio device: ${audioTracks[0].label}`);
+            message.innerText+=`Using audio device: ${audioTracks[0].label}\n`;
         }
         if (videoTracks.length > 0) {
             console.log(`Using video device: ${videoTracks[0].label}`);
+            message.innerText+=`Using video device: ${videoTracks[0].label}\n`;
         }
         // Create an RTCPeerConnection via the polyfill.
         const servers = null;
@@ -85,15 +89,18 @@
 
         window.stream.getTracks().forEach(track => pc1Local.addTrack(track, window.stream));
         console.log('Adding local stream to pc1Local');
+        message.innerText+='Adding local stream to pc1Local\n';
+
         window.stream.getTracks().forEach(track => pc2Local.addTrack(track, window.stream));
         console.log('Adding local stream to pc2Local');
+        message.innerText+='Adding local stream to pc2Local\n';
 
         const {codecs} = RTCRtpSender.getCapabilities('video');
         const codecIndex = codecs.findIndex(c => c.mimeType === "video/H264" && c.sdpFmtpLine.includes("packetization-mode=0"));
         if(codecIndex<0) {
             const codecIndex = codecs.findIndex(c => c.mimeType === "video/H264");
             if(codecIndex<0) {
-            alert("h264 not supported. codec set to default");
+                alert("h264 not supported. codec set to default");
             }
         }
         if(codecIndex>=0) {
@@ -118,6 +125,7 @@
     function gotDescription1Local(desc) {
         pc1Local.setLocalDescription(desc);
         console.log(`Offer from pc1Local\n${desc.sdp}`);
+        message.innerText+='Offer from pc1Local\n';
         pc1Remote.setRemoteDescription(desc);
         // Since the 'remote' side has no media stream we need
         // to pass in the right constraints in order for it to
@@ -128,12 +136,14 @@
     function gotDescription1Remote(desc) {
         pc1Remote.setLocalDescription(desc);
         console.log(`Answer from pc1Remote\n${desc.sdp}`);
+        message.innerText+='Answer from pc1Remote\n';
         pc1Local.setRemoteDescription(desc);
     }
 
     function gotDescription2Local(desc) {
         pc2Local.setLocalDescription(desc);
         console.log(`Offer from pc2Local\n${desc.sdp}`);
+        message.innerText+='Offer from pc2Local\n';
         pc2Remote.setRemoteDescription(desc);
         // Since the 'remote' side has no media stream we need
         // to pass in the right constraints in order for it to
@@ -144,6 +154,7 @@
     function gotDescription2Remote(desc) {
         pc2Remote.setLocalDescription(desc);
         console.log(`Answer from pc2Remote\n${desc.sdp}`);
+        message.innerText+='Answer from pc2Remote\n';
         pc2Local.setRemoteDescription(desc);
     }
 
@@ -151,6 +162,7 @@
         if (video2.srcObject !== e.streams[0]) {
             video2.srcObject = e.streams[0];
             console.log('pc1: received remote stream');
+            message.innerText+="Recieved remote stream1\n";
             result1 = true;
         }
     }
@@ -159,6 +171,7 @@
         if (video3.srcObject !== e.streams[0]) {
             video3.srcObject = e.streams[0];
             console.log('pc2: received remote stream');
+            message.innerText+="Recieved remote stream2\n";
             result2 = true;
         }
     }
